@@ -331,7 +331,7 @@ function updateCategoryChart() {
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
 
-  const palette = ['#63b3ed', '#68d391', '#f6ad55', '#fc8181', '#b794f4', '#f687b3', '#4fd1c5', '#ed8936'];
+  const palette = ['#007aff', '#34c759', '#ff9500', '#ff3b30', '#af52de', '#ff2d55', '#5ac8fa', '#ffcc00'];
   const total = entries.reduce((sum, [, value]) => sum + value, 0);
 
   const displayWidth = canvas.parentElement?.clientWidth || 320;
@@ -369,13 +369,13 @@ function updateCategoryChart() {
   ctx.fill();
 
   // Center total text
-  ctx.fillStyle = '#4a5568';
-  ctx.font = '600 14px "Segoe UI", "PingFang SC", "Helvetica Neue", Arial, sans-serif';
+  ctx.fillStyle = '#8e8e93';
+  ctx.font = '600 13px -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.fillText('总支出', centerX, centerY - 10);
-  ctx.font = '700 18px "Segoe UI", "PingFang SC", "Helvetica Neue", Arial, sans-serif';
-  ctx.fillStyle = '#2d3748';
+  ctx.font = '700 18px -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif';
+  ctx.fillStyle = '#000000';
   ctx.fillText(`¥${total.toFixed(2)}`, centerX, centerY + 10);
 
   ctx.restore();
