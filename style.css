@@ -1,0 +1,250 @@
+/* Reset & base */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Segoe UI", "PingFang SC", "Helvetica Neue", Arial, sans-serif;
+  background: #f0f4f8;
+  color: #333;
+  min-height: 100vh;
+  padding: 24px 16px 48px;
+}
+
+.container {
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+h1 {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 24px;
+  color: #2d3748;
+}
+
+h2 {
+  font-size: 1.1rem;
+  color: #4a5568;
+  margin-bottom: 16px;
+}
+
+/* Summary cards */
+.summary {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px 12px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.card .label {
+  font-size: 0.78rem;
+  color: #718096;
+  font-weight: 500;
+}
+
+.card .amount {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.card.balance .amount { color: #2d3748; }
+.card.income  .amount { color: #38a169; }
+.card.expense .amount { color: #e53e3e; }
+
+/* Form */
+.form-section {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+  margin-bottom: 28px;
+}
+
+.form-group {
+  margin-bottom: 14px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #4a5568;
+  margin-bottom: 5px;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  color: #2d3748;
+  background: #f7fafc;
+  transition: border-color 0.2s;
+  outline: none;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  border-color: #4299e1;
+  background: #fff;
+}
+
+.btn-add {
+  width: 100%;
+  padding: 11px;
+  background: #4299e1;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-add:hover {
+  background: #3182ce;
+}
+
+/* History */
+.history-section {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.history-header h2 {
+  margin-bottom: 0;
+}
+
+.btn-clear {
+  background: none;
+  border: 1.5px solid #fc8181;
+  color: #e53e3e;
+  border-radius: 6px;
+  padding: 5px 12px;
+  font-size: 0.83rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.btn-clear:hover {
+  background: #e53e3e;
+  color: #fff;
+}
+
+#transaction-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.transaction-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: #f7fafc;
+  border-left: 4px solid #cbd5e0;
+  transition: background 0.15s;
+}
+
+.transaction-item.income-item  { border-left-color: #38a169; }
+.transaction-item.expense-item { border-left-color: #e53e3e; }
+
+.transaction-item:hover { background: #edf2f7; }
+
+.item-icon {
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+.item-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.item-desc {
+  font-weight: 600;
+  font-size: 0.95rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.item-meta {
+  font-size: 0.75rem;
+  color: #718096;
+  margin-top: 2px;
+}
+
+.item-amount {
+  font-weight: 700;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.item-amount.positive { color: #38a169; }
+.item-amount.negative { color: #e53e3e; }
+
+.btn-delete {
+  background: none;
+  border: none;
+  color: #a0aec0;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 4px 6px;
+  border-radius: 6px;
+  transition: color 0.2s, background 0.2s;
+  flex-shrink: 0;
+}
+
+.btn-delete:hover {
+  color: #e53e3e;
+  background: #fff5f5;
+}
+
+.empty-msg {
+  text-align: center;
+  color: #a0aec0;
+  font-size: 0.9rem;
+  padding: 24px 0 8px;
+}
+
+/* Responsive */
+@media (max-width: 420px) {
+  .summary {
+    grid-template-columns: 1fr;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+  }
+}
