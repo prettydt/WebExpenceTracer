@@ -4,6 +4,7 @@
  */
 
 const STORAGE_KEY = 'wet_transactions';
+const BUDGET_STORAGE_KEY = 'wet_budgets';
 
 // Category → emoji mapping
 const CATEGORY_ICONS = {
@@ -18,10 +19,25 @@ const CATEGORY_ICONS = {
   '其他': '📦',
 };
 
+const CATEGORY_LIST = Object.keys(CATEGORY_ICONS);
+
+const DEFAULT_BUDGETS = {
+  '餐饮': 1200,
+  '交通': 600,
+  '购物': 800,
+  '住房': 2000,
+  '娱乐': 500,
+  '医疗': 400,
+  '教育': 700,
+  '其他': 500,
+};
+
 // ─── State ────────────────────────────────────────────────────────────────────
 
 /** @type {Array<{id: string, description: string, amount: number, category: string, date: string}>} */
 let transactions = [];
+/** @type {Record<string, number>} */
+let budgets = {};
 
 // ─── Persistence ──────────────────────────────────────────────────────────────
 
@@ -38,6 +54,21 @@ function saveTransactions() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(transactions));
 }
 
+function loadBudgets() {
+  try {
+    const raw = localStorage.getItem(BUDGET_STORAGE_KEY);
+    budgets = raw ? JSON.parse(raw) : {};
+  } catch {
+    budgets = {};
+  }
+
+  budgets = { ...DEFAULT_BUDGETS, ...budgets };
+}
+
+function saveBudgets() {
+  localStorage.setItem(BUDGET_STORAGE_KEY, JSON.stringify(budgets));
+}
+
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function generateId() {
@@ -52,6 +83,25 @@ function formatDate(isoString) {
   const d = new Date(isoString);
   const pad = (n) => String(n).padStart(2, '0');
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function getExpenseCategories() {
+  return CATEGORY_LIST.filter((c) => c !== '收入');
+}
+
+function getExpenseTotalsByCategory() {
+  const totals = {};
+  getExpenseCategories().forEach((c) => { totals[c] = 0; });
+
+  transactions.forEach((t) => {
+    if (t.amount < 0) {
+      const cat = t.category;
+      if (!totals[cat]) totals[cat] = 0;
+      totals[cat] += Math.abs(t.amount);
+    }
+  });
+
+  return totals;
 }
 
 // ─── UI Updates ───────────────────────────────────────────────────────────────
@@ -106,6 +156,8 @@ function renderTransactions() {
 function refresh() {
   updateSummary();
   renderTransactions();
+  renderBudgetList();
+  updateCategoryChart();
 }
 
 // ─── Security helper ─────────────────────────────────────────────────────────
@@ -175,10 +227,172 @@ function handleClearAll() {
   refresh();
 }
 
+function handleSaveBudgets() {
+  const inputs = document.querySelectorAll('[data-budget-input]');
+  inputs.forEach((input) => {
+    const category = input.dataset.category;
+    if (!category) return;
+    const value = parseFloat(input.value);
+    budgets[category] = isNaN(value) || value < 0 ? 0 : value;
+  });
+
+  saveBudgets();
+  renderBudgetList();
+  alert('预算已保存！');
+}
+
+function renderBudgetList() {
+  const container = document.getElementById('budget-list');
+  if (!container) return;
+
+  const totals = getExpenseTotalsByCategory();
+  container.innerHTML = '';
+
+  getExpenseCategories().forEach((category) => {
+    const icon = CATEGORY_ICONS[category] ?? '📦';
+    const budget = Number(budgets[category]) || 0;
+    const spent  = totals[category] ?? 0;
+    const percent = budget > 0 ? Math.min(100, (spent / budget) * 100) : (spent > 0 ? 100 : 0);
+    const over = budget > 0 ? spent > budget : spent > 0;
+
+    const row = document.createElement('div');
+    row.className = 'budget-row';
+
+    const label = document.createElement('div');
+    label.className = 'budget-label';
+    label.textContent = `${icon} ${category}`;
+
+    const inputWrapper = document.createElement('div');
+    inputWrapper.className = 'budget-input';
+
+    const prefix = document.createElement('span');
+    prefix.textContent = '¥';
+    prefix.style.color = '#4a5568';
+    prefix.style.fontWeight = '600';
+
+    const input = document.createElement('input');
+    input.type = 'number';
+    input.step = '0.01';
+    input.min = '0';
+    input.dataset.category = category;
+    input.dataset.budgetInput = 'true';
+    input.value = budget.toString();
+
+    inputWrapper.appendChild(prefix);
+    inputWrapper.appendChild(input);
+
+    const progress = document.createElement('div');
+    progress.className = 'budget-progress';
+
+    const bar = document.createElement('div');
+    bar.className = `budget-bar${over ? ' over' : ''}`;
+    bar.style.width = `${Math.min(100, percent)}%`;
+    progress.appendChild(bar);
+
+    const meta = document.createElement('div');
+    meta.className = 'budget-meta';
+    const usedText = `已用 ¥${spent.toFixed(2)} / 预算 ¥${budget.toFixed(2)}`;
+    const statusText = budget > 0
+      ? `${Math.min(100, percent).toFixed(0)}%`
+      : (spent > 0 ? '未设置预算' : '等待记录');
+    meta.innerHTML = `
+      <span>${usedText}</span>
+      <span class="${over ? 'over' : ''}">${over ? '已超出预算' : statusText}</span>
+    `;
+
+    row.appendChild(label);
+    row.appendChild(inputWrapper);
+    row.appendChild(progress);
+    row.appendChild(meta);
+
+    container.appendChild(row);
+  });
+}
+
+function updateCategoryChart() {
+  const canvas = document.getElementById('category-chart');
+  const emptyMsg = document.getElementById('chart-empty');
+  const legend = document.getElementById('chart-legend');
+  if (!canvas) return;
+
+  const totals = getExpenseTotalsByCategory();
+  const entries = Object.entries(totals).filter(([, value]) => value > 0);
+
+  if (entries.length === 0) {
+    canvas.style.display = 'none';
+    if (legend) legend.innerHTML = '';
+    if (emptyMsg) emptyMsg.style.display = 'block';
+    return;
+  }
+
+  canvas.style.display = 'block';
+  if (emptyMsg) emptyMsg.style.display = 'none';
+
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+
+  const palette = ['#63b3ed', '#68d391', '#f6ad55', '#fc8181', '#b794f4', '#f687b3', '#4fd1c5', '#ed8936'];
+  const total = entries.reduce((sum, [, value]) => sum + value, 0);
+
+  const displayWidth = canvas.parentElement?.clientWidth || 320;
+  const displayHeight = 260;
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = displayWidth * dpr;
+  canvas.height = displayHeight * dpr;
+  canvas.style.width = `${displayWidth}px`;
+  canvas.style.height = `${displayHeight}px`;
+
+  ctx.save();
+  ctx.scale(dpr, dpr);
+  ctx.clearRect(0, 0, displayWidth, displayHeight);
+
+  const centerX = displayWidth / 2;
+  const centerY = displayHeight / 2;
+  const radius  = Math.min(displayWidth, displayHeight) / 2 - 10;
+
+  let startAngle = -Math.PI / 2;
+  entries.forEach(([label, value], idx) => {
+    const sliceAngle = (value / total) * Math.PI * 2;
+    ctx.beginPath();
+    ctx.moveTo(centerX, centerY);
+    ctx.arc(centerX, centerY, radius, startAngle, startAngle + sliceAngle);
+    ctx.closePath();
+    ctx.fillStyle = palette[idx % palette.length];
+    ctx.fill();
+    startAngle += sliceAngle;
+  });
+
+  // Cutout for doughnut style
+  ctx.beginPath();
+  ctx.fillStyle = '#fff';
+  ctx.arc(centerX, centerY, radius * 0.55, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Center total text
+  ctx.fillStyle = '#4a5568';
+  ctx.font = '600 14px "Segoe UI", "PingFang SC", "Helvetica Neue", Arial, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('总支出', centerX, centerY - 10);
+  ctx.font = '700 18px "Segoe UI", "PingFang SC", "Helvetica Neue", Arial, sans-serif';
+  ctx.fillStyle = '#2d3748';
+  ctx.fillText(`¥${total.toFixed(2)}`, centerX, centerY + 10);
+
+  ctx.restore();
+
+  if (legend) {
+    legend.innerHTML = entries.map(([label, value], idx) => {
+      const color = palette[idx % palette.length];
+      return `<span class="legend-item"><span class="legend-dot" style="background:${color}"></span>${label} ¥${value.toFixed(2)}</span>`;
+    }).join('');
+  }
+}
+
 // ─── Bootstrap ────────────────────────────────────────────────────────────────
 
 document.addEventListener('DOMContentLoaded', () => {
   loadTransactions();
+  loadBudgets();
   refresh();
 
   document.getElementById('transaction-form').addEventListener('submit', handleFormSubmit);
@@ -191,4 +405,5 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.getElementById('clear-all').addEventListener('click', handleClearAll);
+  document.getElementById('save-budgets').addEventListener('click', handleSaveBudgets);
 });
