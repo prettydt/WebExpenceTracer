@@ -3,12 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <title>记账应用 - WebExpenseTracer</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="container">
+  <!-- iOS-style Navigation Header -->
+  <div class="nav-header">
     <h1>💰 记账应用</h1>
+  </div>
+
+  <div class="container">
 
     <!-- Summary Cards -->
     <div class="summary">
@@ -51,7 +57,7 @@
         </div>
         <div class="form-group">
           <label for="category">类别</label>
-          <select id="category">
+          <select id="category" aria-label="选择交易类别">
             <option value="收入">💵 收入</option>
             <option value="餐饮">🍜 餐饮</option>
             <option value="交通">🚌 交通</option>
