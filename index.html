@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>记账应用 - WebExpenseTracer</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>💰 记账应用</h1>
+
+    <!-- Summary Cards -->
+    <div class="summary">
+      <div class="card balance">
+        <span class="label">当前余额</span>
+        <span class="amount" id="balance">¥0.00</span>
+      </div>
+      <div class="card income">
+        <span class="label">总收入</span>
+        <span class="amount" id="total-income">¥0.00</span>
+      </div>
+      <div class="card expense">
+        <span class="label">总支出</span>
+        <span class="amount" id="total-expense">¥0.00</span>
+      </div>
+    </div>
+
+    <!-- Add Transaction Form -->
+    <div class="form-section">
+      <h2>添加记录</h2>
+      <form id="transaction-form">
+        <div class="form-group">
+          <label for="description">描述</label>
+          <input
+            type="text"
+            id="description"
+            placeholder="例：工资、餐饮、交通…"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="amount">金额 (¥)</label>
+          <input
+            type="number"
+            id="amount"
+            placeholder="正数为收入，负数为支出"
+            step="0.01"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="category">类别</label>
+          <select id="category">
+            <option value="收入">💵 收入</option>
+            <option value="餐饮">🍜 餐饮</option>
+            <option value="交通">🚌 交通</option>
+            <option value="购物">🛍️ 购物</option>
+            <option value="住房">🏠 住房</option>
+            <option value="娱乐">🎮 娱乐</option>
+            <option value="医疗">🏥 医疗</option>
+            <option value="教育">📚 教育</option>
+            <option value="其他">📦 其他</option>
+          </select>
+        </div>
+        <button type="submit" class="btn-add">添加记录</button>
+      </form>
+    </div>
+
+    <!-- Transaction History -->
+    <div class="history-section">
+      <div class="history-header">
+        <h2>交易记录</h2>
+        <button id="clear-all" class="btn-clear" title="清空所有记录">清空</button>
+      </div>
+      <ul id="transaction-list">
+        <!-- Transactions rendered here -->
+      </ul>
+      <p id="empty-msg" class="empty-msg">暂无记录，快去添加第一笔吧！</p>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
