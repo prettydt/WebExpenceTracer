@@ -403,8 +403,7 @@ h2 {
   background: #f2f2f7;
 }
 
-.transaction-item.income-item  {}
-.transaction-item.expense-item {}
+
 
 .item-icon {
   font-size: 1.5rem;
@@ -505,6 +504,6 @@ h2 {
   }
   
   .card .label {
-    font-size: 0.7rem;
+    font-size: 0.75rem;
   }
 }
