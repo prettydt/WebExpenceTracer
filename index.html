@@ -67,6 +67,30 @@
       </form>
     </div>
 
+    <!-- Analytics -->
+    <div class="analytics-grid">
+      <div class="panel chart-panel">
+        <div class="panel-header">
+          <h2>图表统计</h2>
+          <span class="panel-subtitle">按类别支出分布</span>
+        </div>
+        <div class="chart-wrapper">
+          <canvas id="category-chart" aria-label="按类别支出图表"></canvas>
+          <p id="chart-empty" class="empty-msg small">暂无支出数据，添加支出后查看图表。</p>
+        </div>
+        <div id="chart-legend" class="chart-legend"></div>
+      </div>
+
+      <div class="panel budget-panel">
+        <div class="panel-header">
+          <h2>分类预算</h2>
+          <button id="save-budgets" class="btn-secondary" type="button">保存预算</button>
+        </div>
+        <p class="panel-desc">为各类别设置预算，支出超额时会高亮提示（仅统计负数金额）。</p>
+        <div id="budget-list" class="budget-list"></div>
+      </div>
+    </div>
+
     <!-- Transaction History -->
     <div class="history-section">
       <div class="history-header">
